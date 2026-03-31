@@ -1,0 +1,17 @@
+{
+  "name": "ADSESPAÇOLASER",
+  "short_name": "ADSESPAÇOLASER",
+  "description": "Monitoramento unificado de campanhas de Facebook Ads",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#020617",
+  "theme_color": "#020617",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='9' fill='%230284c7'/><path d='M7 9h18v11H7z M12 25h8 M16 20v5' stroke='white' stroke-width='2.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

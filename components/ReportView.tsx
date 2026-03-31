@@ -1,0 +1,1 @@
+// Arquivo removido conforme solicitação de remoção da funcionalidade de relatórios.
