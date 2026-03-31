@@ -55,7 +55,7 @@ export const askAssistant = async (campaigns: AdSet[], question: string): Promis
         `;
 
         const response = await ai.models.generateContent({
-            model: "gemini-3-pro-preview",
+            model: "gemini-3-flash-preview",
             contents: prompt,
             config: {
                 thinkingConfig: { thinkingBudget: 4000 },

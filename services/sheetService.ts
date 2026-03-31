@@ -9,13 +9,20 @@ const getSheetId = (url: string): string => {
 
 const fetchSheetData = async (sheetName: string): Promise<any[]> => {
   const sheetId = getSheetId(GOOGLE_SHEET_CSV_URL);
-  const url = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&sheet=${encodeURIComponent(sheetName)}`;
+  // Adiciona timestamp para evitar cache do navegador e garantir dados frescos
+  const url = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&sheet=${encodeURIComponent(sheetName)}&t=${Date.now()}`;
 
   try {
-    const response = await fetch(url);
-    if (!response.ok) return [];
+    const response = await fetch(url, { cache: 'no-store' });
+    if (!response.ok) {
+      console.warn(`Aba "${sheetName}" não encontrada ou sem acesso.`);
+      return [];
+    }
     const text = await response.text();
-    if (text.trim().startsWith("<!DOCTYPE") || text.includes("<html")) return [];
+    if (text.trim().startsWith("<!DOCTYPE") || text.includes("<html")) {
+      console.warn(`Aba "${sheetName}" retornou HTML em vez de CSV. Verifique se a planilha está publicada.`);
+      return [];
+    }
     return parseCSV(text);
   } catch (error) {
     console.error(`Erro ao buscar aba ${sheetName}:`, error);
