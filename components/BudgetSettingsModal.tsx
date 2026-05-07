@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Save, DollarSign, Target, CreditCard, CalendarRange, Zap } from 'lucide-react';
+import { X, Save, DollarSign, Target, CreditCard, CalendarRange, Zap, Download, Upload } from 'lucide-react';
 import { UNIT_DISPLAY_ORDER } from '../types';
 
 interface BudgetSettingsModalProps {
@@ -48,6 +48,58 @@ export const BudgetSettingsModal: React.FC<BudgetSettingsModalProps> = ({ curren
 
   const handleSave = () => {
     onSave(tempBudgets, tempRealBalances, tempPeriods, tempManualDailyValues);
+  };
+
+  const handleExport = () => {
+    const backupKeys = [
+      'ads_monitor_dismissed_ids',
+      'ads_monitor_unit_budgets',
+      'ads_monitor_unit_periods',
+      'ads_monitor_weekly_deposits',
+      'ads_monitor_real_balances',
+      'ads_monitor_completed_units_manual',
+      'ads_monitor_manual_daily_values',
+      'ads_monitor_monthly_history',
+      'ads_monitor_active_month_date',
+      'ads_monitor_unlocked_history_months'
+    ];
+
+    const backupData: Record<string, string | null> = {};
+    backupKeys.forEach(key => {
+      backupData[key] = localStorage.getItem(key);
+    });
+
+    const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `backup_ads_monitor_${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const data = JSON.parse(event.target?.result as string) as Record<string, string | null>;
+        Object.entries(data).forEach(([key, value]) => {
+          if (value !== null) {
+            localStorage.setItem(key, value);
+          }
+        });
+        alert('Backup importado com sucesso! O aplicativo será recarregado.');
+        window.location.reload();
+      } catch (err) {
+        alert('Erro ao importar backup. Verifique o arquivo.');
+      }
+    };
+    reader.readAsText(file);
   };
 
   return (
@@ -167,14 +219,38 @@ export const BudgetSettingsModal: React.FC<BudgetSettingsModalProps> = ({ curren
           </div>
         </div>
 
-        <div className="p-8 border-t border-slate-800 bg-slate-900/30 flex justify-end gap-4">
-          <button onClick={onClose} className="px-6 py-3 text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-white transition-colors">Cancelar</button>
-          <button 
-            onClick={handleSave}
-            className="px-10 py-3 bg-sky-600 text-white text-[10px] font-black rounded-xl uppercase tracking-widest flex items-center gap-2.5 hover:bg-sky-500 transition-all shadow-xl shadow-sky-500/20 border border-sky-400/20"
-          >
-            <Save className="w-4 h-4" /> Salvar Configurações
-          </button>
+        <div className="p-8 border-t border-slate-800 bg-slate-900/30 flex flex-wrap justify-between items-center gap-4">
+          <div className="flex gap-2">
+            <button 
+              onClick={handleExport}
+              className="px-4 py-2 bg-slate-800 border border-slate-700 text-slate-300 text-[9px] font-black rounded-lg uppercase tracking-widest flex items-center gap-2 hover:bg-slate-700 transition-all"
+            >
+              <Download className="w-3.5 h-3.5" /> Exportar Backup
+            </button>
+            <div className="relative">
+              <input 
+                type="file" 
+                accept=".json"
+                onChange={handleImport}
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+              />
+              <button 
+                className="px-4 py-2 bg-slate-800 border border-slate-700 text-slate-300 text-[9px] font-black rounded-lg uppercase tracking-widest flex items-center gap-2 hover:bg-slate-700 transition-all"
+              >
+                <Upload className="w-3.5 h-3.5" /> Importar Backup
+              </button>
+            </div>
+          </div>
+
+          <div className="flex gap-4">
+            <button onClick={onClose} className="px-6 py-3 text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-white transition-colors">Cancelar</button>
+            <button 
+              onClick={handleSave}
+              className="px-10 py-3 bg-sky-600 text-white text-[10px] font-black rounded-xl uppercase tracking-widest flex items-center gap-2.5 hover:bg-sky-500 transition-all shadow-xl shadow-sky-500/20 border border-sky-400/20"
+            >
+              <Save className="w-4 h-4" /> Salvar Configurações
+            </button>
+          </div>
         </div>
       </div>
     </div>

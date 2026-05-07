@@ -268,7 +268,7 @@ const generateDailyDataFromAdSets = (adSets: AdSet[]): RawDailyData[] => {
 export const fetchCampaignsFromSheet = async (): Promise<DashboardData> => {
   try {
     const prefixes = Object.keys(ESPACOLASER_UNITS);
-    const sheetNamesToFetch = ["Dashboard", "Página 01", "Pagina 01", ...prefixes];
+    const sheetNamesToFetch = ["Dashboard", "Página 01", "Pagina 01", "14", "15", ...prefixes];
     const allAdSets: AdSet[] = [];
 
     for (const name of sheetNamesToFetch) {

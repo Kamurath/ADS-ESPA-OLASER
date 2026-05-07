@@ -93,7 +93,9 @@ export const UNIT_DISPLAY_ORDER = [
   "Corumbá / MS",
   "Fortaleza / CE",
   "Macaé Shopping Plaza / RJ",
-  "Macaé Centro (Silva Jardim) / RJ"
+  "Macaé Centro (Silva Jardim) / RJ",
+  "Quixadá / CE",
+  "Tinhanguá / CE"
 ];
 
 export const ESPACOLASER_UNITS: Record<string, string> = {
@@ -108,7 +110,9 @@ export const ESPACOLASER_UNITS: Record<string, string> = {
   "EL - COR": "Corumbá / MS",
   "EL - FOR": "Fortaleza / CE",
   "EL - MACS": "Macaé Shopping Plaza / RJ",
-  "EL - MACE": "Macaé Centro (Silva Jardim) / RJ"
+  "EL - MACE": "Macaé Centro (Silva Jardim) / RJ",
+  "EL - QUIX": "Quixadá / CE",
+  "EL - TIN": "Tinhanguá / CE"
 };
 
 export const getUnitBudget = (unitName: string): number => {
