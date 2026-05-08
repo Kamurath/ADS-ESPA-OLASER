@@ -112,28 +112,50 @@ const transformCsvToAdSets = (rows: any[], targetPrefix: string): AdSet[] => {
   ];
 
   rows.forEach((row) => {
-    const accountNameRaw = getValueByKeys(row, ['account_name', 'nome_da_conta', 'ad_account_name']) || '';
+    const accountNameRaw = getValueByKeys(row, ['account_name', 'nome_da_conta', 'ad_account_name', 'conta_de_anuncios', 'account', 'ad_account', 'nome_da_conta_de_anuncios']) || '';
+    const accountIdRaw = getValueByKeys(row, ['account_id', 'id_da_conta', 'ad_account_id']) || '';
     const campaignName = getValueByKeys(row, ['campaign_name', 'nome_da_campanha']) || '';
     const adSetName = getValueByKeys(row, ['ad_set_name', 'nome_do_conjunto', 'adset_name']) || '';
     const adName = getValueByKeys(row, ['ad_name', 'nome_do_anuncio']) || '';
     
-    const compositeSearch = `${accountNameRaw} ${campaignName} ${adSetName} ${adName}`.toUpperCase();
-    if (!compositeSearch.includes(targetPrefix.toUpperCase())) return;
+    const compositeSearch = `${accountNameRaw} ${accountIdRaw} ${campaignName} ${adSetName} ${adName}`.toUpperCase();
+    
+    // Verificação ultra-robusta para Quixadá: 
+    // 1. Busca prefixo padrão 'EL - QUIX' ou sem espaço 'EL-QUIX'
+    // 2. Busca nome da conta exato fornecido 'CPA - QUIXADÁ' ou variantes
+    // 3. Busca o Account ID específico fornecido '523802613601178'
+    // 4. Busca 'QUIXADA' sem acento
+    const isQuixadaMatch = targetPrefix === "EL - QUIX" && (
+      accountNameRaw.toUpperCase().includes("CPA - QUIXADÁ") || 
+      accountNameRaw.toUpperCase().includes("CPA-QUIXADA") ||
+      accountNameRaw.toUpperCase().includes("QUIXADÁ") ||
+      accountIdRaw.includes("523802613601178") ||
+      compositeSearch.includes("EL - QUIX") ||
+      compositeSearch.includes("EL-QUIX") ||
+      compositeSearch.includes("QUIXADÁ") ||
+      compositeSearch.includes("QUIXADA") ||
+      compositeSearch.includes("CPA - QUIX")
+    );
+    
+    if (!compositeSearch.includes(targetPrefix.replace(/\s/g, '').toUpperCase()) && 
+        !compositeSearch.includes(targetPrefix.toUpperCase()) && 
+        !isQuixadaMatch) return;
 
     // ID Estabilizado para evitar perda de silenciamento (Dismissal)
     const adKey = [accountNameRaw, campaignName, adSetName, adName]
       .map(s => s.trim().toUpperCase())
       .join('|');
 
-    const spend = parseMetric(getValueByKeys(row, ['amount_spent', 'valor_gasto', 'spend', 'investimento', 'cost']));
+    const spend = parseMetric(getValueByKeys(row, ['amount_spent', 'valor_gasto', 'spend', 'investimento', 'cost', 'valor', 'total_spent', 'gasto']));
     const conversations = parseMetric(getValueByKeys(row, [
         'messaging_conversations_started', 
         'conversas_iniciadas', 
         'onsite_conversion', 
         'action_messaging_conversations_started_onsite_conversion',
-        'mensagens', 'conversoes', 'resultados'
+        'mensagens', 'conversoes', 'resultados', 'conversas_por_mensagem_iniciadas',
+        'mensagens_enviadas', 'leads'
     ]));
-    const impressions = parseMetric(getValueByKeys(row, ['impressions', 'impressoes']));
+    const impressions = parseMetric(getValueByKeys(row, ['impressions', 'impressoes', 'exibicoes', 'visualizacoes']));
     let reach = parseMetric(getValueByKeys(row, ['reach', 'alcance']));
     if (reach > impressions) reach = impressions;
 
@@ -268,7 +290,14 @@ const generateDailyDataFromAdSets = (adSets: AdSet[]): RawDailyData[] => {
 export const fetchCampaignsFromSheet = async (): Promise<DashboardData> => {
   try {
     const prefixes = Object.keys(ESPACOLASER_UNITS);
-    const sheetNamesToFetch = ["Dashboard", "Página 01", "Pagina 01", "14", "15", ...prefixes];
+    const sheetNamesToFetch = [
+      "Dashboard", 
+      "Página 01", "Pagina 01", "Página01", "Pagina01",
+      "14", "Página 14", "Pagina 14", "Página14", "Pagina14",
+      "15", "Página 15", "Pagina 15", "Página15", "Pagina15",
+      "Página 16", "Página 17", "Página 18",
+      ...prefixes
+    ];
     const allAdSets: AdSet[] = [];
 
     for (const name of sheetNamesToFetch) {
