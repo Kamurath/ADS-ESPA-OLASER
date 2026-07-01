@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Save, DollarSign, Target, CreditCard, CalendarRange, Zap, Download, Upload, Plus, Trash2, Link, Layers } from 'lucide-react';
+import { X, Save, DollarSign, Target, CreditCard, CalendarRange, Zap, Download, Upload, Plus, Trash2, Link, Layers, Edit2 } from 'lucide-react';
 import { UNIT_DISPLAY_ORDER, getStoredUnits, CustomUnit } from '../types';
 
 interface BudgetSettingsModalProps {
@@ -25,6 +25,94 @@ export const BudgetSettingsModal: React.FC<BudgetSettingsModalProps> = ({ curren
   const [newName, setNewName] = useState('');
   const [newPrefix, setNewPrefix] = useState('');
   const [newSheetUrl, setNewSheetUrl] = useState('');
+
+  // Edit unit state
+  const [editingPrefix, setEditingPrefix] = useState<string | null>(null);
+  const [editName, setEditName] = useState('');
+  const [editPrefix, setEditPrefix] = useState('');
+  const [editSheetUrl, setEditSheetUrl] = useState('');
+
+  const handleStartEdit = (unit: CustomUnit) => {
+    setEditingPrefix(unit.prefix);
+    setEditName(unit.name);
+    setEditPrefix(unit.prefix);
+    setEditSheetUrl(unit.sheetUrl || '');
+  };
+
+  const handleCancelEdit = () => {
+    setEditingPrefix(null);
+  };
+
+  const handleSaveEdit = (oldPrefix: string) => {
+    if (!editName.trim() || !editPrefix.trim()) {
+      alert('Por favor, preencha o nome e o prefixo.');
+      return;
+    }
+
+    const updatedPrefix = editPrefix.trim().toUpperCase();
+    if (updatedPrefix !== oldPrefix && customUnits.some(u => u.prefix.toUpperCase() === updatedPrefix)) {
+      alert('Já existe uma unidade com este prefixo!');
+      return;
+    }
+
+    const updatedUnits = customUnits.map(u => {
+      if (u.prefix === oldPrefix) {
+        return {
+          name: editName.trim(),
+          prefix: updatedPrefix,
+          sheetUrl: editSheetUrl.trim() !== '' ? editSheetUrl.trim() : undefined
+        };
+      }
+      return u;
+    });
+
+    setCustomUnits(updatedUnits);
+
+    // If unit name changed, migrate the settings to the new name key
+    const matchedUnit = customUnits.find(u => u.prefix === oldPrefix);
+    if (matchedUnit && matchedUnit.name !== editName.trim()) {
+      const oldName = matchedUnit.name;
+      const newNameStr = editName.trim();
+
+      setTempBudgets(prev => {
+        const copy = { ...prev };
+        if (copy[oldName] !== undefined) {
+          copy[newNameStr] = copy[oldName];
+          delete copy[oldName];
+        }
+        return copy;
+      });
+
+      setTempPeriods(prev => {
+        const copy = { ...prev };
+        if (copy[oldName] !== undefined) {
+          copy[newNameStr] = copy[oldName];
+          delete copy[oldName];
+        }
+        return copy;
+      });
+
+      setTempManualDailyValues(prev => {
+        const copy = { ...prev };
+        if (copy[oldName] !== undefined) {
+          copy[newNameStr] = copy[oldName];
+          delete copy[oldName];
+        }
+        return copy;
+      });
+
+      setTempRealBalances(prev => {
+        const copy = { ...prev };
+        if (copy[oldName] !== undefined) {
+          copy[newNameStr] = copy[oldName];
+          delete copy[oldName];
+        }
+        return copy;
+      });
+    }
+
+    setEditingPrefix(null);
+  };
 
   const handleBudgetChange = (unit: string, value: string) => {
     const numericValue = parseFloat(value) || 0;
@@ -283,30 +371,93 @@ export const BudgetSettingsModal: React.FC<BudgetSettingsModalProps> = ({ curren
                 <h3 className="text-xs font-black text-slate-300 uppercase tracking-widest pl-1">Unidades Cadastradas ({customUnits.length})</h3>
                 <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
                   {customUnits.map((unit) => (
-                    <div key={unit.prefix} className="bg-slate-950/40 border border-slate-800/50 p-3.5 rounded-2xl flex items-center justify-between gap-4">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <span className="text-[11px] font-black text-white">{unit.name}</span>
-                          <span className="px-1.5 py-0.5 bg-slate-800 text-slate-400 rounded text-[8px] font-bold uppercase tracking-wider">{unit.prefix}</span>
+                    <div key={unit.prefix} className="bg-slate-950/40 border border-slate-800/50 p-3.5 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+                      {editingPrefix === unit.prefix ? (
+                        <div className="flex-1 space-y-3 w-full">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div className="space-y-1">
+                              <label className="text-[8px] font-black text-slate-400 uppercase tracking-widest pl-1">Nome da Unidade</label>
+                              <input 
+                                type="text"
+                                value={editName}
+                                onChange={(e) => setEditName(e.target.value)}
+                                className="w-full bg-slate-900 border border-slate-800 rounded-xl py-2 px-3 text-xs font-bold text-slate-200 focus:outline-none focus:border-sky-500/50"
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <label className="text-[8px] font-black text-slate-400 uppercase tracking-widest pl-1">Prefixo</label>
+                              <input 
+                                type="text"
+                                value={editPrefix}
+                                onChange={(e) => setEditPrefix(e.target.value)}
+                                className="w-full bg-slate-900 border border-slate-800 rounded-xl py-2 px-3 text-xs font-bold text-slate-200 focus:outline-none focus:border-sky-500/50"
+                              />
+                            </div>
+                          </div>
+                          <div className="space-y-1">
+                            <label className="text-[8px] font-black text-slate-400 uppercase tracking-widest pl-1">Link da Planilha (Opcional)</label>
+                            <input 
+                              type="text"
+                              value={editSheetUrl}
+                              onChange={(e) => setEditSheetUrl(e.target.value)}
+                              placeholder="https://docs.google.com/spreadsheets/d/..."
+                              className="w-full bg-slate-900 border border-slate-800 rounded-xl py-2 px-3 text-[10px] font-bold text-slate-200 focus:outline-none focus:border-sky-500/50"
+                            />
+                          </div>
+                          <div className="flex justify-end gap-2 pt-1">
+                            <button
+                              type="button"
+                              onClick={handleCancelEdit}
+                              className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-[9px] font-black rounded-lg uppercase tracking-widest transition-all"
+                            >
+                              Cancelar
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleSaveEdit(unit.prefix)}
+                              className="px-3 py-1.5 bg-sky-600 hover:bg-sky-500 text-white text-[9px] font-black rounded-lg uppercase tracking-widest transition-all"
+                            >
+                              Salvar
+                            </button>
+                          </div>
                         </div>
-                        <p className="text-[8px] text-slate-500 mt-1 truncate flex items-center gap-1">
-                          <Link className="w-2.5 h-2.5 text-slate-600 shrink-0" />
-                          {unit.sheetUrl ? (
-                            <span className="text-sky-500/80 underline truncate">{unit.sheetUrl}</span>
-                          ) : (
-                            <span className="italic text-slate-600">Planilha padrão</span>
-                          )}
-                        </p>
-                      </div>
-                      
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveUnit(unit.prefix)}
-                        className="p-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg transition-all"
-                        title="Remover Unidade"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
+                      ) : (
+                        <>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <span className="text-[11px] font-black text-white">{unit.name}</span>
+                              <span className="px-1.5 py-0.5 bg-slate-800 text-slate-400 rounded text-[8px] font-bold uppercase tracking-wider">{unit.prefix}</span>
+                            </div>
+                            <p className="text-[8px] text-slate-500 mt-1 truncate flex items-center gap-1">
+                              <Link className="w-2.5 h-2.5 text-slate-600 shrink-0" />
+                              {unit.sheetUrl ? (
+                                <span className="text-sky-500/80 underline truncate">{unit.sheetUrl}</span>
+                              ) : (
+                                <span className="italic text-slate-600">Planilha padrão</span>
+                              )}
+                            </p>
+                          </div>
+                          
+                          <div className="flex items-center gap-2 shrink-0">
+                            <button
+                              type="button"
+                              onClick={() => handleStartEdit(unit)}
+                              className="p-2 bg-sky-500/10 hover:bg-sky-500/20 text-sky-400 rounded-lg transition-all"
+                              title="Editar Unidade"
+                            >
+                              <Edit2 className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveUnit(unit.prefix)}
+                              className="p-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg transition-all"
+                              title="Remover Unidade"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </>
+                      )}
                     </div>
                   ))}
                 </div>

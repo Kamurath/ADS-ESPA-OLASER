@@ -99,20 +99,20 @@ export const getStoredUnits = (): CustomUnit[] => {
     }
   }
   return [
-    { prefix: "EL - ARA", name: "Araripina / PE" },
-    { prefix: "EL - ST", name: "Serra Talhada / PE" },
-    { prefix: "EL - GUS", name: "Garanhuns / PE" },
-    { prefix: "EL - CZ", name: "Cajazeiras / PB" },
-    { prefix: "EL - VSA", name: "Vitória de Santo Antão / PE" },
-    { prefix: "EL - LIV", name: "Santana do Livramento / RS" },
-    { prefix: "EL - MUR", name: "Muriaé / MG" },
-    { prefix: "EL - VIL", name: "Vilhena / RO" },
-    { prefix: "EL - COR", name: "Corumbá / MS" },
-    { prefix: "EL - FOR", name: "Fortaleza / CE" },
-    { prefix: "EL - MACS", name: "Macaé Shopping Plaza / RJ" },
-    { prefix: "EL - MACE", name: "Macaé Centro (Silva Jardim) / RJ" },
-    { prefix: "EL - QUIX", name: "Quixadá / CE" },
-    { prefix: "EL - TIN", name: "Tinhanguá / CE" }
+    { prefix: "EL - ARA", name: "Araripina / PE", sheetUrl: "https://docs.google.com/spreadsheets/d/1DuYsrl5yzoc_SpU9yKg2O5JFOygbij8MQuKTOZQ4CAw/edit?usp=sharing" },
+    { prefix: "EL - ST", name: "Serra Talhada / PE", sheetUrl: "https://docs.google.com/spreadsheets/d/1DuYsrl5yzoc_SpU9yKg2O5JFOygbij8MQuKTOZQ4CAw/edit?usp=sharing" },
+    { prefix: "EL - GUS", name: "Garanhuns / PE", sheetUrl: "https://docs.google.com/spreadsheets/d/1DuYsrl5yzoc_SpU9yKg2O5JFOygbij8MQuKTOZQ4CAw/edit?usp=sharing" },
+    { prefix: "EL - CZ", name: "Cajazeiras / PB", sheetUrl: "https://docs.google.com/spreadsheets/d/1DuYsrl5yzoc_SpU9yKg2O5JFOygbij8MQuKTOZQ4CAw/edit?usp=sharing" },
+    { prefix: "EL - VSA", name: "Vitória de Santo Antão / PE", sheetUrl: "https://docs.google.com/spreadsheets/d/1DuYsrl5yzoc_SpU9yKg2O5JFOygbij8MQuKTOZQ4CAw/edit?usp=sharing" },
+    { prefix: "EL - LIV", name: "Santana do Livramento / RS", sheetUrl: "https://docs.google.com/spreadsheets/d/1DuYsrl5yzoc_SpU9yKg2O5JFOygbij8MQuKTOZQ4CAw/edit?usp=sharing" },
+    { prefix: "EL - MUR", name: "Muriaé / MG", sheetUrl: "https://docs.google.com/spreadsheets/d/1DuYsrl5yzoc_SpU9yKg2O5JFOygbij8MQuKTOZQ4CAw/edit?usp=sharing" },
+    { prefix: "EL - VIL", name: "Vilhena / RO", sheetUrl: "https://docs.google.com/spreadsheets/d/1DuYsrl5yzoc_SpU9yKg2O5JFOygbij8MQuKTOZQ4CAw/edit?usp=sharing" },
+    { prefix: "EL - COR", name: "Corumbá / MS", sheetUrl: "https://docs.google.com/spreadsheets/d/1DuYsrl5yzoc_SpU9yKg2O5JFOygbij8MQuKTOZQ4CAw/edit?usp=sharing" },
+    { prefix: "EL - FOR", name: "Fortaleza / CE", sheetUrl: "https://docs.google.com/spreadsheets/d/1DuYsrl5yzoc_SpU9yKg2O5JFOygbij8MQuKTOZQ4CAw/edit?usp=sharing" },
+    { prefix: "EL - MACS", name: "Macaé Shopping Plaza / RJ", sheetUrl: "https://docs.google.com/spreadsheets/d/1DuYsrl5yzoc_SpU9yKg2O5JFOygbij8MQuKTOZQ4CAw/edit?usp=sharing" },
+    { prefix: "EL - MACE", name: "Macaé Centro (Silva Jardim) / RJ", sheetUrl: "https://docs.google.com/spreadsheets/d/1DuYsrl5yzoc_SpU9yKg2O5JFOygbij8MQuKTOZQ4CAw/edit?usp=sharing" },
+    { prefix: "EL - QUIX", name: "Quixadá / CE", sheetUrl: "https://docs.google.com/spreadsheets/d/1DuYsrl5yzoc_SpU9yKg2O5JFOygbij8MQuKTOZQ4CAw/edit?usp=sharing" },
+    { prefix: "EL - TIN", name: "Tinhanguá / CE", sheetUrl: "https://docs.google.com/spreadsheets/d/1DuYsrl5yzoc_SpU9yKg2O5JFOygbij8MQuKTOZQ4CAw/edit?usp=sharing" }
   ];
 };
 
