@@ -251,7 +251,7 @@ export default function App() {
       setViewedMonthDate(prevDateStr);
     } else {
       if (viewedMonthDate === activeMonthDate) {
-        if (completedUnits.size < 12) return;
+        if (completedUnits.size < UNIT_DISPLAY_ORDER.length) return;
         setIsMonthConfirmOpen(true);
       } else {
         let nextMonth = month + 1;
@@ -492,7 +492,7 @@ export default function App() {
                 <div className="px-4 min-w-[140px] text-center">
                   <span className="text-[11px] font-black uppercase tracking-widest text-slate-200">{formatMonthLabel(viewedMonthDate)}</span>
                 </div>
-                <button onClick={() => navigateMonth('next')} disabled={viewedMonthDate === activeMonthDate && (displayData?.completed?.size || 0) < 12} className={`p-2 rounded-xl transition-all ${viewedMonthDate === activeMonthDate ? 'text-slate-700 opacity-40' : 'text-slate-400 hover:text-white hover:bg-slate-800 cursor-pointer'}`}><ChevronRight className="w-5 h-5" /></button>
+                <button onClick={() => navigateMonth('next')} disabled={viewedMonthDate === activeMonthDate && (displayData?.completed?.size || 0) < UNIT_DISPLAY_ORDER.length} className={`p-2 rounded-xl transition-all ${viewedMonthDate === activeMonthDate ? 'text-slate-700 opacity-40' : 'text-slate-400 hover:text-white hover:bg-slate-800 cursor-pointer'}`}><ChevronRight className="w-5 h-5" /></button>
               </div>
             </div>
 

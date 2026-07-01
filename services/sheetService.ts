@@ -1,5 +1,5 @@
 
-import { AdSet, CampaignStatus, DashboardData, RawDailyData, IssueSeverity, ESPACOLASER_UNITS, getUnitBudget, OperationalStatus } from '../types';
+import { AdSet, CampaignStatus, DashboardData, RawDailyData, IssueSeverity, ESPACOLASER_UNITS, getUnitBudget, OperationalStatus, getStoredUnits, CustomUnit } from '../types';
 
 export const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1DuYsrl5yzoc_SpU9yKg2O5JFOygbij8MQuKTOZQ4CAw/edit?usp=sharing"; 
 
@@ -7,8 +7,8 @@ const getSheetId = (url: string): string => {
   return url.split("/d/")[1]?.split("/")[0] || "";
 };
 
-const fetchSheetData = async (sheetName: string): Promise<any[]> => {
-  const sheetId = getSheetId(GOOGLE_SHEET_CSV_URL);
+const fetchSheetData = async (sheetUrl: string, sheetName: string): Promise<any[]> => {
+  const sheetId = getSheetId(sheetUrl || GOOGLE_SHEET_CSV_URL);
   // Adiciona timestamp para evitar cache do navegador e garantir dados frescos
   const url = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&sheet=${encodeURIComponent(sheetName)}&t=${Date.now()}`;
 
@@ -289,23 +289,41 @@ const generateDailyDataFromAdSets = (adSets: AdSet[]): RawDailyData[] => {
 
 export const fetchCampaignsFromSheet = async (): Promise<DashboardData> => {
   try {
-    const prefixes = Object.keys(ESPACOLASER_UNITS);
-    const sheetNamesToFetch = [
-      "Dashboard", 
-      "Página 01", "Pagina 01", "Página01", "Pagina01",
-      "14", "Página 14", "Pagina 14", "Página14", "Pagina14",
-      "15", "Página 15", "Pagina 15", "Página15", "Pagina15",
-      "Página 16", "Página 17", "Página 18",
-      ...prefixes
-    ];
+    const customUnits = getStoredUnits();
     const allAdSets: AdSet[] = [];
 
-    for (const name of sheetNamesToFetch) {
-      const data = await fetchSheetData(name);
-      if (data.length > 0) {
-        prefixes.forEach(prefix => {
-          allAdSets.push(...transformCsvToAdSets(data, prefix));
-        });
+    // Group units by their sheet URL. If a unit has no custom sheetUrl, use default GOOGLE_SHEET_CSV_URL
+    const defaultSheetUrl = GOOGLE_SHEET_CSV_URL;
+    const groups: Record<string, CustomUnit[]> = {};
+
+    customUnits.forEach(unit => {
+      const url = (unit.sheetUrl && unit.sheetUrl.trim() !== '') ? unit.sheetUrl.trim() : defaultSheetUrl;
+      if (!groups[url]) {
+        groups[url] = [];
+      }
+      groups[url].push(unit);
+    });
+
+    // Fetch data for each sheet group
+    for (const [sheetUrl, unitsInGroup] of Object.entries(groups)) {
+      const prefixes = unitsInGroup.map(u => u.prefix);
+      
+      const sheetNamesToFetch = [
+        "Dashboard", 
+        "Página 01", "Pagina 01", "Página01", "Pagina01",
+        "14", "Página 14", "Pagina 14", "Página14", "Pagina14",
+        "15", "Página 15", "Pagina 15", "Página15", "Pagina15",
+        "Página 16", "Página 17", "Página 18",
+        ...prefixes
+      ];
+
+      for (const name of sheetNamesToFetch) {
+        const data = await fetchSheetData(sheetUrl, name);
+        if (data.length > 0) {
+          prefixes.forEach(prefix => {
+            allAdSets.push(...transformCsvToAdSets(data, prefix));
+          });
+        }
       }
     }
 

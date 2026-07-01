@@ -81,39 +81,49 @@ export interface ChatMessage {
   timestamp: Date;
 }
 
-export const UNIT_DISPLAY_ORDER = [
-  "Araripina / PE",
-  "Serra Talhada / PE",
-  "Garanhuns / PE",
-  "Cajazeiras / PB",
-  "Vitória de Santo Antão / PE",
-  "Santana do Livramento / RS",
-  "Muriaé / MG",
-  "Vilhena / RO",
-  "Corumbá / MS",
-  "Fortaleza / CE",
-  "Macaé Shopping Plaza / RJ",
-  "Macaé Centro (Silva Jardim) / RJ",
-  "Quixadá / CE",
-  "Tinhanguá / CE"
-];
+export interface CustomUnit {
+  prefix: string;
+  name: string;
+  sheetUrl?: string;
+}
 
-export const ESPACOLASER_UNITS: Record<string, string> = {
-  "EL - ARA": "Araripina / PE",
-  "EL - ST": "Serra Talhada / PE",
-  "EL - GUS": "Garanhuns / PE",
-  "EL - CZ": "Cajazeiras / PB",
-  "EL - VSA": "Vitória de Santo Antão / PE",
-  "EL - LIV": "Santana do Livramento / RS",
-  "EL - MUR": "Muriaé / MG",
-  "EL - VIL": "Vilhena / RO",
-  "EL - COR": "Corumbá / MS",
-  "EL - FOR": "Fortaleza / CE",
-  "EL - MACS": "Macaé Shopping Plaza / RJ",
-  "EL - MACE": "Macaé Centro (Silva Jardim) / RJ",
-  "EL - QUIX": "Quixadá / CE",
-  "EL - TIN": "Tinhanguá / CE"
+export const getStoredUnits = (): CustomUnit[] => {
+  if (typeof window !== 'undefined') {
+    const saved = localStorage.getItem('ads_monitor_custom_units');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        console.error("Error parsing custom units:", e);
+      }
+    }
+  }
+  return [
+    { prefix: "EL - ARA", name: "Araripina / PE" },
+    { prefix: "EL - ST", name: "Serra Talhada / PE" },
+    { prefix: "EL - GUS", name: "Garanhuns / PE" },
+    { prefix: "EL - CZ", name: "Cajazeiras / PB" },
+    { prefix: "EL - VSA", name: "Vitória de Santo Antão / PE" },
+    { prefix: "EL - LIV", name: "Santana do Livramento / RS" },
+    { prefix: "EL - MUR", name: "Muriaé / MG" },
+    { prefix: "EL - VIL", name: "Vilhena / RO" },
+    { prefix: "EL - COR", name: "Corumbá / MS" },
+    { prefix: "EL - FOR", name: "Fortaleza / CE" },
+    { prefix: "EL - MACS", name: "Macaé Shopping Plaza / RJ" },
+    { prefix: "EL - MACE", name: "Macaé Centro (Silva Jardim) / RJ" },
+    { prefix: "EL - QUIX", name: "Quixadá / CE" },
+    { prefix: "EL - TIN", name: "Tinhanguá / CE" }
+  ];
 };
+
+const customUnitsList = getStoredUnits();
+
+export const UNIT_DISPLAY_ORDER = customUnitsList.map(u => u.name);
+
+export const ESPACOLASER_UNITS: Record<string, string> = customUnitsList.reduce((acc, u) => {
+  acc[u.prefix] = u.name;
+  return acc;
+}, {} as Record<string, string>);
 
 export const getUnitBudget = (unitName: string): number => {
   if (unitName === "Corumbá / MS") return 1200;
