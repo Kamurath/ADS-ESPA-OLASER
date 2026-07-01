@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#020617" />
+      <stop offset="100%" stop-color="#0b1530" />
+    </linearGradient>
+    <linearGradient id="accent-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="100%" stop-color="#0284c7" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="12" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+  <rect width="512" height="512" rx="128" fill="url(#bg-grad)"/>
+  
+  <!-- Outer glowing orbital circle -->
+  <circle cx="256" cy="256" r="180" fill="none" stroke="url(#accent-grad)" stroke-width="8" stroke-dasharray="12 8" opacity="0.4"/>
+  <circle cx="256" cy="256" r="160" fill="none" stroke="#0284c7" stroke-width="4" opacity="0.2"/>
+
+  <!-- Styled Laser / Laser Beam Graphic (Espaçolaser Theme) -->
+  <g filter="url(#glow)">
+    <!-- Main graph line with node points -->
+    <path d="M150 360 L220 220 L300 300 L370 150" fill="none" stroke="url(#accent-grad)" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  
+  <!-- Graphical target nodes -->
+  <circle cx="150" cy="360" r="14" fill="#0284c7" stroke="#ffffff" stroke-width="3"/>
+  <circle cx="220" cy="220" r="14" fill="#38bdf8" stroke="#ffffff" stroke-width="3"/>
+  <circle cx="300" cy="300" r="14" fill="#0ea5e9" stroke="#ffffff" stroke-width="3"/>
+  <circle cx="370" cy="150" r="16" fill="#f43f5e" stroke="#ffffff" stroke-width="4" filter="url(#glow)"/>
+
+  <!-- Aesthetic crosshairs indicating laser/precision targeting -->
+  <line x1="370" y1="110" x2="370" y2="190" stroke="#f43f5e" stroke-width="3" stroke-dasharray="6 4" opacity="0.8" />
+  <line x1="330" y1="150" x2="410" y2="150" stroke="#f43f5e" stroke-width="3" stroke-dasharray="6 4" opacity="0.8" />
+</svg>

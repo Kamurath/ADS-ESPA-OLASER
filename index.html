@@ -12,9 +12,9 @@
     <meta name="theme-color" content="#020617">
     
     <!-- Icons -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='9' fill='%230284c7'/><path d='M7 9h18v11H7z M12 25h8 M16 20v5' stroke='white' stroke-width='2.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='9' fill='%230284c7'/><path d='M7 9h18v11H7z M12 25h8 M16 20v5' stroke='white' stroke-width='2.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>">
-    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/svg+xml" href="/icon.svg">
+    <link rel="apple-touch-icon" href="/icon.svg">
+    <link rel="manifest" href="/manifest.json">
 
     <script>
       // Early shim para evitar erros de 'process is not defined'
@@ -24,6 +24,19 @@
           NODE_ENV: 'production'
         } 
       };
+
+      // Registro do Service Worker para suporte a PWA (instalação no Desktop/Mobile)
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+          navigator.serviceWorker.register('/sw.js')
+            .then(function(reg) {
+              console.log('Service Worker registrado com sucesso:', reg.scope);
+            })
+            .catch(function(err) {
+              console.error('Falha ao registrar o Service Worker:', err);
+            });
+        });
+      }
       
       // Captura erros globais de carregamento
       window.addEventListener('error', function(e) {
